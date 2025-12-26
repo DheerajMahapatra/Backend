@@ -52,12 +52,24 @@ const userSchema = new Schema(
     }
 );
 
-userSchema.pre("save", async function (next) {
-    if(!this.isModified("password")) return next();
+// userSchema.pre("save", async function (next) {
+//     if(!this.isModified("password")) return next();
 
-    this.password = await bcrypt.hash(this.password, 10)
-    next()
-})
+//     this.password = await bcrypt.hash(this.password, 10)
+//     next()
+// })
+
+userSchema.pre("save", async function () {
+    if (!this.isModified("password")) return;
+
+    //console.log("Before hashing:", this.password);
+
+    this.password = await bcrypt.hash(this.password, 10);
+
+    //console.log("After hashing:", this.password);
+});
+
+
 
 userSchema.methods.isPasswordCorrect = async function (password) {
     return await bcrypt.compare(password, this.password)
